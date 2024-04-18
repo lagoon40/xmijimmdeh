@@ -1,0 +1,51 @@
+name: Sprayer
+
+on:
+  workflow_dispatch:
+    inputs:
+      methodEnc:
+        description: 'Request method encoded as Base64'
+        required: true
+        type: string
+      urlEnc:
+        description: 'Request URL encoded as Base64'
+        required: true
+        type: string
+      headersEnc:
+        description: 'Request headers encoded as Base64'
+        required: false
+        type: string
+      bodyEnc:
+        description: 'Request body encoded as Base64'
+        required: false
+        type: string
+      runIdentifier:
+        description: 'run identifier'
+        required: false
+
+jobs:
+  id:
+    name: Workflow ID Provider
+    runs-on: ubuntu-latest
+    steps:
+      - name: ${{github.event.inputs.runIdentifier}}
+        run: echo run identifier ${{ inputs.runIdentifier }}
+  req:
+    name: Request
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: python3 -m pip install -r requirements.txt
+      - name: Run script
+        run: python sprayer.py
+        env:
+          METHOD_ENC: ${{ inputs.methodEnc }}
+          URL_ENC: ${{ inputs.urlEnc }}
+          HEADERS_ENC: ${{ inputs.headersEnc }} 
+          BODY_ENC: ${{ inputs.bodyEnc }}  
+      
